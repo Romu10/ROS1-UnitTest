@@ -24,7 +24,7 @@ class TestRobotWaypoints(unittest.TestCase):
 
         rospy.init_node('roation_test_node')
         self.odom_sub = rospy.Subscriber('/odom', Odometry, self.odom_callback)
-        self.yaw_precision = 0.535
+        self.yaw_precision = 0.20
         self.init_position = Point()
         self.current_position = Point()
         self.final_positon = Point()
@@ -69,8 +69,8 @@ class TestRobotWaypoints(unittest.TestCase):
         
         if client.wait_for_server(rospy.Duration(10)):  
             self.goal_msg = Pose()
-            self.goal_msg.position.x = 0.15
-            self.goal_msg.position.y = 0.0
+            self.goal_msg.position.x = 0.40
+            self.goal_msg.position.y = -0.1
             self.goal_msg.position.z = 0.0
 
             client.send_goal(self.goal_msg, feedback_cb=self.feedback_cb)
@@ -93,9 +93,9 @@ class TestRobotWaypoints(unittest.TestCase):
         s = rospy.ServiceProxy('/gazebo/reset_world', Empty)
         resp = s.call(EmptyRequest())
 
-    def test_correct_position(self):
+    def test_correct_rotation(self):
         #Compare the final orientation with the current position 
-        desired_yaw = math.atan2(self.goal_msg.position.y - self.final_positon.y, self.goal_msg.position.x - self.final_positon.x)
+        desired_yaw = math.atan2(self.goal_msg.position.y - self.current_position.y, self.goal_msg.position.x - self.current_position.x)
         err_yaw = desired_yaw - self.yaw
         print("This is the final error: %f", math.fabs(err_yaw))
         self.assertTrue((math.fabs(err_yaw) < self.yaw_precision), "Orientation error. Minimal orientation error (0.15) was not between the expected values.")
