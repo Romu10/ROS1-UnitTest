@@ -60,14 +60,14 @@ class TestRobotWaypoints(unittest.TestCase):
         client = actionlib.SimpleActionClient('tortoisebot_as', WaypointActionAction)
         
         if client.wait_for_server(rospy.Duration(10)):  
-            goal_msg = Pose()
-            goal_msg.position.x = 0.15
-            goal_msg.position.y = 0.35
-            goal_msg.position.z = 0.0
+            self.goal_msg = Pose()
+            self.goal_msg.position.x = 0.45
+            self.goal_msg.position.y = -0.1
+            self.goal_msg.position.z = 0.0
 
-            client.send_goal(goal_msg, feedback_cb=self.feedback_cb)
+            client.send_goal(self.goal_msg, feedback_cb=self.feedback_cb)
             
-            if client.wait_for_result(rospy.Duration(10)):  
+            if client.wait_for_result(rospy.Duration(15)):  
                 result = client.get_result()
                 return result
             else:
@@ -87,8 +87,8 @@ class TestRobotWaypoints(unittest.TestCase):
 
     def test_correct_position(self):
         #Compare the final position with the current position 
-        self.error_pos = math.sqrt(pow(self.final_positon.y - self.current_position.y, 2) + pow(self.final_positon.x - self.current_position.x, 2))
-        self.assertTrue((0.0 <= self.error_pos <= 0.5), "Position error. Minimal distance error was not between the expected values.")
+        self.error_pos = math.sqrt(pow(self.goal_msg.position.y - self.final_positon.y, 2) + pow(self.goal_msg.position.x - self.final_positon.x, 2))
+        self.assertTrue((0.0 < self.error_pos < 0.2), "Position error. Minimal distance error was not between the expected values.")
         print("Error: %f", self.error_pos)
 
 if __name__ == '__main__':
