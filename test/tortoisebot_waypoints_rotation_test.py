@@ -69,8 +69,8 @@ class TestRobotWaypoints(unittest.TestCase):
         
         if client.wait_for_server(rospy.Duration(10)):  
             self.goal_msg = Pose()
-            self.goal_msg.position.x = 0.40
-            self.goal_msg.position.y = -0.1
+            self.goal_msg.position.x = 0.15
+            self.goal_msg.position.y = 0.35
             self.goal_msg.position.z = 0.0
 
             client.send_goal(self.goal_msg, feedback_cb=self.feedback_cb)
