@@ -61,8 +61,8 @@ class TestRobotWaypoints(unittest.TestCase):
         client.wait_for_server()
 
         goal_msg = Pose()
-        goal_msg.position.x = 0.1
-        goal_msg.position.y = 0.1
+        goal_msg.position.x = 0.15
+        goal_msg.position.y = 0.35
         goal_msg.position.z = 0.0
 
         client.send_goal(goal_msg, feedback_cb=self.feedback_cb)
