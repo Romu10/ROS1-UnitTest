@@ -51,27 +51,32 @@ class TestRobotWaypoints(unittest.TestCase):
         self.current_position = msg.pose.pose.position
 
     def feedback_cb(self, msg):
+
         print ('Feedback position received:', msg.position)
         self.final_positon = msg.position
 
     def action_service_call(self):
 
         client = actionlib.SimpleActionClient('tortoisebot_as', WaypointActionAction)
+        
+        if client.wait_for_server(rospy.Duration(10)):  
+            goal_msg = Pose()
+            goal_msg.position.x = 0.15
+            goal_msg.position.y = 0.35
+            goal_msg.position.z = 0.0
 
-        client.wait_for_server()
+            client.send_goal(goal_msg, feedback_cb=self.feedback_cb)
+            
+            if client.wait_for_result(rospy.Duration(10)):  
+                result = client.get_result()
+                return result
+            else:
+                rospy.logwarn("Timeout waiting for action result")
+                client.cancel_goal()  
+        else:
+            rospy.logwarn("Timeout waiting for action server 'tortoisebot_as'")
 
-        goal_msg = Pose()
-        goal_msg.position.x = 0.15
-        goal_msg.position.y = 0.35
-        goal_msg.position.z = 0.0
-
-        client.send_goal(goal_msg, feedback_cb=self.feedback_cb)
-
-        client.wait_for_result()
-
-        result = client.get_result()
-
-        return result
+        return None  
 
 
     def service_call_world_reset(self):
